@@ -66,7 +66,9 @@ $cssdata = optional_param("cssdata", false, PARAM_RAW);
 $htmldata = optional_param("htmldata", false, PARAM_RAW);
 if ($cssdata && $htmldata && sesskey() == optional_param("sesskey", false, PARAM_RAW)) {
 
-    $cssdata = preg_replace('/\*(\s+)?\{.*?\}|body(\s+)?\{.*?\}/', "", $cssdata);
+    // Removes the "*" and "body" rules added by GrapesJS. The block may have braces inside values, such as
+    // url("{$PLUGIN->field}") of a datainfo plugin: stopping at the first "}" left the rest of the rule as garbage.
+    $cssdata = preg_replace('/(?:^|(?<=[{};]))\s*(?:\*|body)\s*\{(?:[^{}]|\{[^{}]*\})*\}/', "", $cssdata);
     $htmldata = preg_replace('/<body>(.*)<\/body>/', "$1", $htmldata);
 
     $certificatebeautifulmodel->pages_info_object[$page] = [
